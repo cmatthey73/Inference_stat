@@ -70,15 +70,13 @@ False :
         + alpha = False positives / Tot negatives
         + beta = False negatives / Tot positives
         
-![](./Inference_stat/illustr_distrib.png){#id .class width=50% height=50%}
+![](./illustr_distrib.png){#id .class width=50% height=50%}
         
 * values (psycho) : alpha = 5%, 1-beta = 80% 
     + if proba H0 vs H1 = 50% - 50% => most likely outcome = True Negative
     + adapt alpha, beta => slightly changes most likely outcome
     + bigger effect if proba H0 vs H1 = 10% - 90% => most likely outcome = True Positive
     + donne une idée a priori du résultat qui sera obtenu selon ce que l'on pense de la probabilité des hypothèses
-    
-
     
 ### Assignment 1
 
@@ -226,11 +224,96 @@ axis(side=1, at=seq(0,1, 0.01), labels=seq(0,1,0.01))
 axis(side=2, at=seq(0,nSims, nSims/4), labels=seq(0,nSims, nSims/4), las=2)
 abline(h=nSims/bars, col = "red", lty=3)
 
+```
+
+## Likelihood and Bayesian statistics
+
+### Likelihood
+
+* Likelihoods are a way to express the **relative evidence** for one hypothesis over another hypothesis
+* A likelihood gives you the function of a parameter given the data : L($\theta$)=f(x,$\theta$)
+* NB : proba = x variable, $\theta$ fixe / likelihood = x fixe, $\theta$ variable
+* E.g. if flip coin 10x, 8 heads :
+    + binomial likelihood function, $\theta$ = proba at each draw / in the long run, x = observed freq, n = nb flips
+    + how likely is $\theta$ if x and n !
+    + hyp $\theta$=0.8, L(0.8) = 0.3
+    + hyp $\theta$=0.4, L(0.4) = 0.1 
+    + less and less likely if far from observed frequence (max likely if $\theta$ = obs freq)
+* Likelihood function invented by R. Fisher
+* Likelihood ratio : L(H1) / L(H0) => if high enough, evidence for H1 (Royall, 1997):
+    + 8 = moderately strong evidence
+    + 32 = strong evidence
+    + BUT both H can be very unlikely and ratio very high !
+* Application to multiple studies :
+    + for each study, binomial outcome (signif or not signif) => proba study signif =
+        + $\alpha$ if no true effect
+        + 1-$\beta$ if true effect
+    + likelihood ratio : 
+        + proba(nb signif if H1 = effect) / proba(nb signif if H0 = no effect) 
+        + L($\theta$=(1-$\beta$)=0.8) / L($\theta$=$\alpha$=0.05) given the nb signif !
+    + multiple studies SHOULD give mixed results even with decent power (if 80%, likelihood 3 studies are signif = 51% !)
+    + likelihood curves if 4 studies : ![](./likely_curve_mult.png){#id .class width=50% height=50%}
+        + $\theta$=(1-$\beta$)=power
+        + each curve = nb signif out of 4 studies
+
+### Assignment 2.1 - likelihood
+
+* $\theta$ = proba(success) at each draw
+* most probable $\theta$ = max likelihood !
+* likelihoods are an example of statistical inference: We have observed some data, and we use this data to draw an inference about different parameter. More formally, the likelihood function is the (joint) density function evaluated at the observed data. Likelihood functions can be calculated for many different models (binomial distributions, normal distributions, etc., see Millar, 2011)
+* L(12/20)=L(8/10)*L(4/10)
+* **as the sample size increases, the likelihood curves become more narrow**
+* note that likelihood ratios give us the relative evidence for one specified hypothesis, over another specified hypothesis. The likelihood ratio can be calculated for any two hypothesized value
+* likelihoods are relative evidence. Just because the data are more likely under one possible value of $\theta$ than another value, doesn't mean that the data have come from either of these two distribution
+
+```{r exp_likelihood}
+
+# n<-10 #set total trials
+# x<-8 #set successes
+# theta<- 0.5 #create theta variable, from 0 to 1
+# dbinom(x,n,theta) #create likelihood function
+
+#plot likelihood curve----
+n<-10 #set total trials
+x<-0 #set successes
+theta<- seq(0,1,len=100) #create theta variable, from 0 to 1
+like <- dbinom(x,n,theta) #create likelihood function
+plot(theta,like,type='l',xlab=expression(theta), ylab='Likelihood', main="Likelihood Curve")
+
+#Calculate the likelihood ratio----
+n<-c(10, 100, 1000) #set total trials
+x<-c(5, 50, 500) #set successes
+H0 <- 4/10 #specify one hypothesis you want to compare with the likihood ratio
+H1 <- 5/10 #specify another hypothesis you want to compare with the likihood ratio (you can use 1/20, or 0.05)
+# dbinom(x,n,H0)/dbinom(x,n,H1) #Returns the likelihood ratio of H0 over H1
+# dbinom(x,n,H1)/dbinom(x,n,H0) #Returns the likelihood ratio of H1 over H0
+
+theta<- seq(0,1,len=100) #create theta variable, from 0 to 1
+like<-list()
+for (i in 1:3)
+like[[i]] <- dbinom(x[i],n[i],theta)
+#png(file="LikRatio.png",width=4000,height=3000, , units = "px", res = 900)
+plot(theta,like[[1]]/max(like[[1]]),type='l',xlab=expression(theta), ylab='Likelihood', lwd=2)
+lines(theta,like[[2]]/max(like[[2]]),type='l',lwd=2, col="blue")
+lines(theta,like[[3]]/max(like[[3]]),type='l',lwd=2, col="red")
+points(H0,dbinom(x,n,H0))
+points(H1,dbinom(x,n,H1))
+segments(H0, dbinom(x,n,H0), x/n, dbinom(x,n,H0), lty=2, lwd=2)
+segments(H1, dbinom(x,n,H1), x/n, dbinom(x,n,H1), lty=2, lwd=2)
+segments(x/n, dbinom(x,n,H0), x/n, dbinom(x,n,H1), lwd=2)
+title(paste('Likelihood Ratio H0/H1:',round(dbinom(x,n,H0)/dbinom(x,n,H1),digits=2)," Likelihood Ratio H1/H0:",round(dbinom(x,n,H1)/dbinom(x,n,H0),digits=2)))
+#dev.off()
 
 
 ```
 
-## Likelihood and Bayesian statistics
+### Binomial Bayesian Inference
+
+* p-value = proba(data | H0)
+* posterior proba = proba(H0 | data)
+* Bayes : prior belief + data => posterior belief
+* Posterior odds = proba(data | H1) / proba(data | H0)  = proba(H1 | data) / proba(H0 | data) \* proba(H1) / proba(H0) = likelihood ratio \* prior ratio
+* Prior distribution : if binomial proba prior distribution = beta-distribution
 
 
 
