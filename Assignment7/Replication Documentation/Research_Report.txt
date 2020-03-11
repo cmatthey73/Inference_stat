@@ -1,0 +1,29 @@
+Research Report
+**********************************************************
+**********************************************************
+
+Test :
+******
+
+Hypothesis : Razzie-nominated movies have a lower IMDB rating then Oscar-nominated ones
+Test :	- one-sided t-test, alpha = 5%
+		- H0 = no-effect (difference=0) / H1 = positive effect (difference>0)
+		- 2 samples of 28 obs, movies with the highest nr of votes between 01/01/1990 - 31/12/2019, for each group
+		- sample size for an expected power of 90% if strong effect
+
+Results :
+*********
+
+Two Sample t-test
+
+data:  dataIMB$Rating[dataIMB$Oscar == 1] and dataIMB$Rating[dataIMB$Oscar == 0]
+t = 12.358, df = 54, p-value < 2.2e-16
+alternative hypothesis: true difference in means is greater than 0
+95 percent confidence interval: 1.451258      Inf
+sample estimates: 	mean of x 	mean of y 
+					8.550000  	6.871429 
+					
+Conclusion :
+************
+
+Ratings are significantly higher if Oscar-nominated vs Razzie-nominated

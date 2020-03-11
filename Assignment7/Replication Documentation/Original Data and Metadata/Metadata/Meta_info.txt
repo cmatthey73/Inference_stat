@@ -1,0 +1,19 @@
+
+******************************************* Info on data *******************************************
+
+Data downloaded on Feb. 15, 2020, from https://www.imdb.com/
+
+Search through https://www.imdb.com/search/title/
+Search terms :	- Title Groups : 1 search with Oscar-Nominated, 1 search with Razzie-Nominated
+		- Release Date : from 01/01/1990 to 31/12/2019
+		- Display Options : Compact, 50 per page, NumVotes descending
+
+Sample : first 28 movies, for each search (1x Oscar-Nominated, 1x Razzie-Nominated)
+
+Variables collected :
+		- Film : name of the movie 
+		- Rating : IMDB rating
+		- Oscar : 1 if Oscar-Nominated, 0 if Razzie-Nominated
+		
+
+				
